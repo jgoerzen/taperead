@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+if [ -z "$TAPE" ]; then
+    echo "Need to set TAPE, perhaps to /dev/nst0?"
+    exit 5
+fi
+
+FILENO="${FILENO:=1}"
+EMPTIES=0
+while [ "$EMPTIES" -lt 4] ; do
+    FILENAME="`printf "file-%02d.bin" "$FILENO"`"
+    if [ -e "$FILENAME" ]; then
+        echo "Error: $FILENAME exists"
+        exit 5
+    fi
+    echo "Writing $FILENAME..."
+    CSUM="`dd "if=$TAPE" bs=1048576 conv=noerror,sync | mbuffer -m 100M -s 1M | tee "$FILENAME" | sha256sum | awk '{ print $1 }'`" || true
+    
+    echo "$CSUM  $FILENAME" >> sums
+    
+    if [ -z "$FILENAME" ]; then
+        EMPTIES=$(($EMPTIES + 1))
+    fi
+    FILENO=$(($FILENO + 1))
+done
+
+    
