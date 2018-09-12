@@ -9,7 +9,7 @@ fi
 
 FILENO="${FILENO:=1}"
 EMPTIES=0
-while [ "$EMPTIES" -lt 4] ; do
+while [ "$EMPTIES" -lt 4 ] ; do
     FILENAME="`printf "file-%02d.bin" "$FILENO"`"
     if [ -e "$FILENAME" ]; then
         echo "Error: $FILENAME exists"
@@ -20,10 +20,13 @@ while [ "$EMPTIES" -lt 4] ; do
     
     echo "$CSUM  $FILENAME" >> sums
     
-    if [ -z "$FILENAME" ]; then
+    if [ ! -s "$FILENAME" ]; then
         EMPTIES=$(($EMPTIES + 1))
     fi
     FILENO=$(($FILENO + 1))
+    sleep 5
 done
 
-    
+sync
+echo "Found end of tape.  Verifying checksums..."
+sha256sum -c sums
