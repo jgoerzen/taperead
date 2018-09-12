@@ -27,10 +27,6 @@ fi
 # Might want to set DDOPTS to conv=noerror,sync if there are errors during
 # read.
 
-echo " Rewinding tape..."
-
-mt -f "$TAPE" rewind || true
-
 FILENO="${FILENO:=1}"
 EMPTIES=0
 while [ "$EMPTIES" -lt 4 ] ; do
