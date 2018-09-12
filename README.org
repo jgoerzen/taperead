@@ -1,0 +1,51 @@
+#+TITLE: taperead: read all files on a tape
+
+* Background
+
+Tape storage media generally are made up of sequential, unnamed files.
+I had a need to read in the data from my old tapes in order to
+transfer it to more modern media.  Some of these tapes contained
+multiple files - archives of various sorts, backups, etc.  I wanted a
+script to do so.
+
+This script will read every file on a tape (stopping when it
+encounters multiple 0-byte reads from the drive).  The files will be
+numbered sequentially.  Logs from =dd= will be saved alongside the
+files for later inspection for errors, etc.
+
+Other than standard Unix tools, ths script also using mbuffer, though
+this is completely optional and can easily enough be removed from the
+pipeline in the script.
+
+* Usage
+
+Something such as this will do it:
+
+=TAPE=/dev/nst0 taperead=
+
+Files will be created in the current working directory.  Additional dd
+options, such as blocksize or error handling, may be set with the
+=DDOPTS= environment variable.  See the comments in the script.
+
+The output will be a series of .bin files representing the contents of
+the tape, and corresponding log files representing the output of dd.
+If any log files indicate an error, the output from taperead from that
+point forth should be considered suspect.  (Files may be truncated,
+etc.)
+
+* Copyright
+
+Copright (c) 2018 John Goerzen <jgoerzen@complete.org>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
