@@ -44,16 +44,11 @@ while [ "$EMPTIES" -lt 4 ] ; do
 	echo "At file -1; assuming drive not ready.  Sleeping 10 seconds..."
 	sleep 10
     fi
-    BLOCKSIZE="`grep 'Tape block size' "$MTINFO" | sed 's/^Tape block size \([0-9]\+\) bytes.*/\1/'`"
-    if [ "$BLOCKSIZE" = "0" ]; then
-	echo "Got zero blocksize, setting to 1024"
-	BLOCKSIZE=1024
-    else
-	echo "Block size is $BLOCKSIZE bytes."
-    fi
-    BLOCKSIZE=$(( 32 * 1024))
+    TAPEBLOCKSIZE="`grep 'Tape block size' "$MTINFO" | sed 's/^Tape block size \([0-9]\+\) bytes.*/\1/'`"
+    echo "Tape block size is $TAPEBLOCKSIZE bytes."
 
-    echo "Final blocksize: $BLOCKSIZE"
+    BLOCKSIZE=$(( 32 * 1024))
+    echo "read blocksize: $BLOCKSIZE"
 	
     CSUM="`dd "if=$TAPE" "bs=$BLOCKSIZE" $DDOPTS 2> >(tee "$LOGNAME" >&2) | mbuffer -m 50M -s "$BLOCKSIZE" | tee "$FILENAME" | sha256sum | awk '{ print $1 }'`" || true
     
