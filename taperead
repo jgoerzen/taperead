@@ -30,7 +30,7 @@ fi
 FILENO="${FILENO:=1}"
 EMPTIES=0
 while [ "$EMPTIES" -lt 4 ] ; do
-    FILENAME="`printf "file-%03d.bin" "$FILENO"`"
+    FILENAME="`printf "file-%05d.bin" "$FILENO"`"
     if [ -e "$FILENAME" ]; then
         echo "Error: $FILENAME exists"
         exit 5
