@@ -18,6 +18,7 @@
 
 
 set -e
+set -o pipefail
 
 if [ -z "$TAPE" ]; then
     echo "Need to set TAPE, perhaps to /dev/nst0?"
@@ -49,11 +50,12 @@ while [ "$EMPTIES" -lt 1 ] ; do
 	sleep 10
         mt -f "$TAPE" status > "$MTINFO"
     fi
+    mt -f "$TAPE" tell >> "$MTINFO"
 
-    CSUM="`dd "if=$TAPE" "bs=$BLOCKSIZE" $DDOPTS 2> >(tee "$LOGNAME" >&2) | mbuffer -m 50M -s "$BLOCKSIZE" | tee "$FILENAME" | sha256sum | awk '{ print $1 }'`" || true
-    RETCODE="$?"
-    if [ "$RETCODE" != "0" ]; then
-        ERRORLIST="$ERRORLIST $FILENAME"
+    if CSUM="`dd "if=$TAPE" "bs=$BLOCKSIZE" $DDOPTS 2> >(tee "$LOGNAME" >&2) | mbuffer -m 50M -s "$BLOCKSIZE" | tee "$FILENAME" | sha256sum | awk '{ print $1 }'`"; then
+	    true
+    else
+	    ERRORLIST="$ERRORLIST $FILENAME"
     fi
     
     if [ ! -s "$FILENAME" ]; then
