@@ -32,6 +32,7 @@ BLOCKSIZE="${BLOCKSIZE:=$(( 32 * 1024))}"
 echo "Using read blocksize: $BLOCKSIZE"
 
 EMPTIES=0
+ERRORLIST=""
 while [ "$EMPTIES" -lt 1 ] ; do
     FILENAME="`printf "file-%03d.bin" "$FILENO"`"
     if [ -e "$FILENAME" ]; then
@@ -49,6 +50,10 @@ while [ "$EMPTIES" -lt 1 ] ; do
     fi
 
     CSUM="`dd "if=$TAPE" "bs=$BLOCKSIZE" $DDOPTS 2> >(tee "$LOGNAME" >&2) | mbuffer -m 50M -s "$BLOCKSIZE" | tee "$FILENAME" | sha256sum | awk '{ print $1 }'`" || true
+    RETCODE="$?"
+    if [ "$RETCODE" != "0" ]; then
+        ERRORLIST="$ERRORLIST $FILENAME"
+    fi
     
     echo "$CSUM  $FILENAME" >> sums
     
@@ -62,5 +67,11 @@ while [ "$EMPTIES" -lt 1 ] ; do
 done
 
 sync
+echo "Found end of tape."
+if [ -z "$ERRORLIST" ]; then
+    echo "No errors reported by dd."
+else
+    echo " >>> IMPORTANT: dd reported errors in: $ERRORLIST"
+fi
 echo "Found end of tape.  Verifying checksums..."
 sha256sum -c sums
