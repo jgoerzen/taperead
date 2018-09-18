@@ -59,7 +59,6 @@ while [ "$EMPTIES" -lt 1 ] ; do
     fi
     FILENO=$(($FILENO + 1))
     date
-    sleep 5
 done
 
 sync
