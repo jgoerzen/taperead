@@ -42,10 +42,10 @@ while [ "$EMPTIES" -lt 1 ] ; do
     MTINFO="`printf "file-%03d.mt" "$FILENO"`"
     echo " ******** Writing $FILENAME..."
     date
-    mt -f "$TAPE" status > "$MTINFO"
     if grep -q 'File number=-' "$MTINFO"; then
 	echo "At file -1; assuming drive not ready.  Sleeping 10 seconds..."
 	sleep 10
+        mt -f "$TAPE" status > "$MTINFO"
     fi
 
     CSUM="`dd "if=$TAPE" "bs=$BLOCKSIZE" $DDOPTS 2> >(tee "$LOGNAME" >&2) | mbuffer -m 50M -s "$BLOCKSIZE" | tee "$FILENAME" | sha256sum | awk '{ print $1 }'`" || true
