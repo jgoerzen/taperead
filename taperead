@@ -28,8 +28,11 @@ fi
 # read.
 
 FILENO="${FILENO:=1}"
+BLOCKSIZE="${BLOCKSIZE:$(( 32 * 1024))}"
+echo "Using read blocksize: $BLOCKSIZE"
+
 EMPTIES=0
-while [ "$EMPTIES" -lt 4 ] ; do
+while [ "$EMPTIES" -lt 1 ] ; do
     FILENAME="`printf "file-%03d.bin" "$FILENO"`"
     if [ -e "$FILENAME" ]; then
         echo "Error: $FILENAME exists"
@@ -44,18 +47,15 @@ while [ "$EMPTIES" -lt 4 ] ; do
 	echo "At file -1; assuming drive not ready.  Sleeping 10 seconds..."
 	sleep 10
     fi
-    TAPEBLOCKSIZE="`grep 'Tape block size' "$MTINFO" | sed 's/^Tape block size \([0-9]\+\) bytes.*/\1/'`"
-    echo "Tape block size is $TAPEBLOCKSIZE bytes."
 
-    BLOCKSIZE=$(( 32 * 1024))
-    echo "read blocksize: $BLOCKSIZE"
-	
     CSUM="`dd "if=$TAPE" "bs=$BLOCKSIZE" $DDOPTS 2> >(tee "$LOGNAME" >&2) | mbuffer -m 50M -s "$BLOCKSIZE" | tee "$FILENAME" | sha256sum | awk '{ print $1 }'`" || true
     
     echo "$CSUM  $FILENAME" >> sums
     
     if [ ! -s "$FILENAME" ]; then
+        echo "$FILENAME was 0-byte; removing."
         EMPTIES=$(($EMPTIES + 1))
+        rm "$FILENAME"
     fi
     FILENO=$(($FILENO + 1))
     date
