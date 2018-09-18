@@ -73,5 +73,5 @@ if [ -z "$ERRORLIST" ]; then
 else
     echo " >>> IMPORTANT: dd reported errors in: $ERRORLIST"
 fi
-echo "Found end of tape.  Verifying checksums..."
+echo "Verifying checksums..."
 sha256sum -c sums
