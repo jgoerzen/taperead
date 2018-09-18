@@ -43,6 +43,7 @@ while [ "$EMPTIES" -lt 1 ] ; do
     MTINFO="`printf "file-%03d.mt" "$FILENO"`"
     echo " ******** Writing $FILENAME..."
     date
+    mt -f "$TAPE" status > "$MTINFO"
     if grep -q 'File number=-' "$MTINFO"; then
 	echo "At file -1; assuming drive not ready.  Sleeping 10 seconds..."
 	sleep 10
