@@ -28,7 +28,7 @@ fi
 # read.
 
 FILENO="${FILENO:=1}"
-BLOCKSIZE="${BLOCKSIZE:$(( 32 * 1024))}"
+BLOCKSIZE="${BLOCKSIZE:=$(( 32 * 1024))}"
 echo "Using read blocksize: $BLOCKSIZE"
 
 EMPTIES=0
