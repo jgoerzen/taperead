@@ -55,12 +55,12 @@ while [ "$EMPTIES" -lt 1 ] ; do
         ERRORLIST="$ERRORLIST $FILENAME"
     fi
     
-    echo "$CSUM  $FILENAME" >> sums
-    
     if [ ! -s "$FILENAME" ]; then
         echo "$FILENAME was 0-byte; removing."
         EMPTIES=$(($EMPTIES + 1))
         rm "$FILENAME"
+    else
+        echo "$CSUM  $FILENAME" >> sums
     fi
     FILENO=$(($FILENO + 1))
     date
